@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\attach_media\Commands;
+namespace Drupal\islandora_attach_media\Commands;
 
 use Drupal\node\Entity\Node;
 use Drupal\media\Entity\Media;
@@ -9,7 +9,7 @@ use Drush\Commands\DrushCommands;
 /**
  * Drush commandfile.
  */
-class AttachMediaCommands extends DrushCommands {
+class IslandoraAttachMediaCommands extends DrushCommands {
 
   /**
    * Attaches the file to the node.
@@ -20,8 +20,8 @@ class AttachMediaCommands extends DrushCommands {
    * @param string $source_file_path
    *   The absolute path to the source file.
    *
-   * @command attach_media:attach
-   * @usage attach_media:attach 100 /tmp/image.jpg
+   * @command islandora_attach_media:attach
+   * @usage islandora_attach_media:attach 100 /tmp/image.jpg
    */
   public function attach($nid, $source_file_path) {
     if (!$node = Node::load($nid)) {
@@ -33,12 +33,18 @@ class AttachMediaCommands extends DrushCommands {
       exit();
     }
 
-    // @todo: Figure out best way to read large files.
+    // @todo: Figure out best way to read large files. But...to quote Bender, "We're boned."
+    // core/lib/Drupal/Core/File/FileSystem.php's saveData() uses file_put_contents(),
+    // which is, along with file_get_contents(), what we need to avoid because they read the
+    // entire file into memory. saveData() is called regardless of whether the destination
+    // file system is local or Fedora.
+    
     $data = file_get_contents($source_file_path);
     $filename = basename($source_file_path);
     $file = file_save_data($data, 'public://' . basename($filename), FILE_EXISTS_REPLACE);
+    // $file = file_save_data($data, 'fedora://' . basename($filename), FILE_EXISTS_REPLACE);
 
-    // @todo: 'bundle' is the Media type. We need to be able to support all of them.
+    // @todo: 'bundle' is the Media type. We need to be able to support all of them, and even new ones.
     $media = Media::create([
       'bundle' => 'file',
       // 'uid' => \Drupal::currentUser()->id(),
