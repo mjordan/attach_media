@@ -1,0 +1,7 @@
+name: 'Attach Media'
+description: "Provides a Drush command to attach a media to a node."
+type: module
+core: 8.x
+core_version_requirement: ^8 || ^9
+dependencies:
+  -media

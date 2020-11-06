@@ -1,0 +1,5 @@
+services:
+  attach_media.commands:
+    class: \Drupal\attach_media\Commands\AttachMediaCommands
+    tags:
+      - { name: drush.command }
